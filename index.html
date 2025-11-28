@@ -6,12 +6,12 @@
     <title>自然科教學經驗交流平台</title>
     <style>
         :root {
-            --primary-color: #006064; /* 科學深青色 */
-            --accent-color: #4DD0E1; /* 淺青色 highlight */
-            --bg-color: #F5F7FA;     /* 淺灰白背景 */
-            --card-bg: #FFFFFF;      /* 卡片白底 */
-            --text-main: #263238;    /* 深灰字體 */
-            --text-sec: #546E7A;     /* 次要字體 */
+            --primary-color: #006064;
+            --accent-color: #4DD0E1;
+            --bg-color: #F5F7FA;
+            --card-bg: #FFFFFF;
+            --text-main: #263238;
+            --text-sec: #546E7A;
             --border-radius: 8px;
             --input-border: #CFD8DC;
         }
@@ -37,7 +37,6 @@
             gap: 20px;
         }
 
-        /* 左側輸入區 */
         .input-section {
             flex: 1;
             background: var(--card-bg);
@@ -50,7 +49,6 @@
             border-top: 5px solid var(--primary-color);
         }
 
-        /* 右側顯示區 */
         .display-section {
             flex: 1.5;
             background: rgba(255, 255, 255, 0.5);
@@ -69,9 +67,7 @@
             margin-top: 0;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .form-group { margin-bottom: 20px; }
 
         label {
             display: block;
@@ -98,24 +94,11 @@
             background-color: #FFF;
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
+        textarea { resize: vertical; min-height: 100px; }
 
-        /* --- 多選年級樣式開始 --- */
-        .grade-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        
-        /* 隱藏原本的 checkbox */
-        .grade-options input[type="checkbox"] {
-            display: none;
-        }
-
-        /* 自訂標籤樣式 */
+        /* 多選年級樣式 */
+        .grade-options { display: flex; flex-wrap: wrap; gap: 8px; }
+        .grade-options input[type="checkbox"] { display: none; }
         .grade-chip {
             padding: 8px 16px;
             background-color: #FAFAFA;
@@ -127,20 +110,52 @@
             transition: all 0.2s;
             user-select: none;
         }
-
-        .grade-chip:hover {
-            border-color: var(--accent-color);
-            background-color: #E0F7FA;
-        }
-
-        /* 當 checkbox 被選中時的樣式 */
+        .grade-chip:hover { border-color: var(--accent-color); background-color: #E0F7FA; }
         .grade-options input[type="checkbox"]:checked + .grade-chip {
             background-color: var(--primary-color);
             color: white;
             border-color: var(--primary-color);
-            box-shadow: 0 2px 4px rgba(0,96,100,0.3);
         }
-        /* --- 多選年級樣式結束 --- */
+
+        /* 圖片上傳樣式 */
+        .file-upload-wrapper {
+            position: relative;
+            border: 2px dashed var(--input-border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background-color: #FAFAFA;
+            transition: all 0.3s;
+        }
+        .file-upload-wrapper:hover {
+            border-color: var(--primary-color);
+            background-color: #E0F7FA;
+        }
+        .file-upload-label {
+            cursor: pointer;
+            color: var(--text-sec);
+            font-size: 0.9rem;
+            display: block;
+        }
+        #fileInput { display: none; }
+        #imagePreview {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 4px;
+            display: none;
+            border: 1px solid #ccc;
+        }
+        .remove-img-btn {
+            display: none;
+            margin-top: 5px;
+            color: #E57373;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: underline;
+            background: none;
+            border: none;
+        }
 
         button.submit-btn {
             background-color: var(--primary-color);
@@ -153,141 +168,58 @@
             font-weight: bold;
             transition: background 0.3s;
             margin-top: 10px;
+            width: 100%;
         }
+        button.submit-btn:hover { background-color: #004D40; }
+        button.submit-btn:disabled { background-color: #B0BEC5; cursor: not-allowed; }
 
-        button.submit-btn:hover {
-            background-color: #004D40;
-        }
-
-        button.submit-btn:disabled {
-            background-color: #B0BEC5;
-            cursor: not-allowed;
-        }
-
-        /* Feed List Style */
-        .feed-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
+        /* Feed 樣式 */
+        .feed-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .refresh-btn {
-            background: none;
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-            padding: 5px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
+            background: none; border: 1px solid var(--primary-color); color: var(--primary-color);
+            padding: 5px 15px; border-radius: 20px; cursor: pointer; font-size: 0.9rem;
         }
-        
-        .refresh-btn:hover {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .feed-container {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-
+        .refresh-btn:hover { background-color: var(--primary-color); color: white; }
+        .feed-container { flex: 1; overflow-y: auto; padding-right: 10px; }
         .card {
-            background: white;
-            border-left: 4px solid var(--accent-color);
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
+            background: white; border-left: 4px solid var(--accent-color);
+            padding: 15px; margin-bottom: 15px; border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;
         }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            color: var(--text-sec);
-            margin-bottom: 8px;
-        }
-
-        .card-tag {
-            background-color: #E0F7FA;
-            color: #006064;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.8rem;
-            margin-right: 5px;
-        }
-
-        .grade-tag {
-            background-color: #F5F5F5;
-            color: #616161;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            border: 1px solid #E0E0E0;
-        }
-
-        .card-title {
-            font-weight: bold;
-            font-size: 1.1rem;
-            margin-bottom: 5px;
-            color: var(--text-main);
-            margin-top: 5px;
-        }
-
-        .card-content {
-            font-size: 0.95rem;
-            line-height: 1.5;
-            color: #455A64;
-            white-space: pre-wrap;
-        }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .card-header { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-sec); margin-bottom: 8px; }
+        .card-tag { background-color: #E0F7FA; color: #006064; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; margin-right: 5px; }
+        .grade-tag { background-color: #F5F5F5; color: #616161; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; border: 1px solid #E0E0E0; }
+        .card-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 5px; color: var(--text-main); margin-top: 5px; }
+        .card-content { font-size: 0.95rem; line-height: 1.5; color: #455A64; white-space: pre-wrap; }
         
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 10px;
+        .card-image {
+            margin-top: 10px;
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 4px;
+            border: 1px solid #eee;
+            display: block;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .loader {
+            border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color);
+            border-radius: 50%; width: 20px; height: 20px;
+            animation: spin 1s linear infinite; display: inline-block;
+            vertical-align: middle; margin-right: 10px;
         }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-                height: auto;
-                overflow-y: auto;
-            }
-            body {
-                overflow: auto;
-                height: auto;
-            }
-            .input-section, .display-section {
-                width: 100%;
-                margin-bottom: 20px;
-            }
+            .container { flex-direction: column; height: auto; overflow-y: auto; }
+            body { overflow: auto; height: auto; }
+            .input-section, .display-section { width: 100%; margin-bottom: 20px; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- 左邊：輸入區 -->
     <div class="input-section">
         <h2>🔬 自然科教學記錄與分享</h2>
         <form id="surveyForm">
@@ -296,40 +228,17 @@
                 <input type="text" id="teacherName" placeholder="請輸入您的全名" required>
             </div>
 
-            <!-- 修改部分：年級改為多選 -->
             <div class="form-group">
                 <label>主要授課年級 (可複選)</label>
                 <div class="grade-options">
-                    <label>
-                        <input type="checkbox" name="grade" value="幼大">
-                        <span class="grade-chip">幼大</span>
-                    </label>
-                    <label>
-                        <input type="checkbox" name="grade" value="小一">
-                        <span class="grade-chip">小一</span>
-                    </label>
-                    <label>
-                        <input type="checkbox" name="grade" value="小二">
-                        <span class="grade-chip">小二</span>
-                    </label>
-                    <label>
-                        <input type="checkbox" name="grade" value="小三">
-                        <span class="grade-chip">小三</span>
-                    </label>
-                    <label>
-                        <input type="checkbox" name="grade" value="小四">
-                        <span class="grade-chip">小四</span>
-                    </label>
-                    <label>
-                        <input type="checkbox" name="grade" value="小五">
-                        <span class="grade-chip">小五</span>
-                    </label>
-                    <label>
-                        <input type="checkbox" name="grade" value="小六">
-                        <span class="grade-chip">小六</span>
-                    </label>
+                    <label><input type="checkbox" name="grade" value="幼大"><span class="grade-chip">幼大</span></label>
+                    <label><input type="checkbox" name="grade" value="小一"><span class="grade-chip">小一</span></label>
+                    <label><input type="checkbox" name="grade" value="小二"><span class="grade-chip">小二</span></label>
+                    <label><input type="checkbox" name="grade" value="小三"><span class="grade-chip">小三</span></label>
+                    <label><input type="checkbox" name="grade" value="小四"><span class="grade-chip">小四</span></label>
+                    <label><input type="checkbox" name="grade" value="小五"><span class="grade-chip">小五</span></label>
+                    <label><input type="checkbox" name="grade" value="小六"><span class="grade-chip">小六</span></label>
                 </div>
-                <!-- 錯誤訊息提示 -->
                 <div id="gradeError" style="color: #E57373; font-size: 0.85rem; display: none; margin-top: 5px;">* 請至少選擇一個年級</div>
             </div>
 
@@ -343,21 +252,34 @@
                 </select>
             </div>
 
+            <!-- 修改：標籤文字更新 -->
             <div class="form-group">
                 <label for="topic">課程或分享主題</label>
-                <input type="text" id="topic" placeholder="例如：看不見的大力士" required>
+                <input type="text" id="topic" placeholder="例如：空氣的熱脹冷縮，或是「關於分組的技巧」" required>
             </div>
 
+            <!-- 修改：標籤文字更新 -->
             <div class="form-group">
                 <label for="content">分享或建議內容</label>
                 <textarea id="content" placeholder="請輸入您想分享的教學亮點、遇到的問題或建議..." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>上傳圖片 (選填，限 2MB 以下)</label>
+                <div class="file-upload-wrapper">
+                    <label for="fileInput" class="file-upload-label" id="fileLabel">
+                        📷 點擊選擇圖片
+                    </label>
+                    <input type="file" id="fileInput" accept="image/*">
+                    <img id="imagePreview" src="#" alt="預覽">
+                    <button type="button" class="remove-img-btn" id="removeImgBtn">移除圖片</button>
+                </div>
             </div>
 
             <button type="submit" class="submit-btn" id="submitBtn">送出資料</button>
         </form>
     </div>
 
-    <!-- 右邊：顯示區 -->
     <div class="display-section">
         <div class="feed-header">
             <h3>📢 老師們的分享動態</h3>
@@ -366,15 +288,13 @@
         <div id="loadingIndicator" style="text-align: center; display: none;">
             <div class="loader"></div> 載入中...
         </div>
-        <div class="feed-container" id="feedContainer">
-            <!-- 資料會動態插入這裡 -->
-        </div>
+        <div class="feed-container" id="feedContainer"></div>
     </div>
 </div>
 
 <script>
     // ******************************************************
-    // 請將下方的 URL 替換成您部署後的 Web App URL (與第一步相同)
+    // 請將 URL 替換成您部署後的 Web App URL (與之前相同)
     // ******************************************************
     const SCRIPT_URL = "https://script.google.com/macros/s/你的_ID_會在這裡/exec";
 
@@ -383,40 +303,69 @@
     const feedContainer = document.getElementById('feedContainer');
     const loadingIndicator = document.getElementById('loadingIndicator');
     const gradeError = document.getElementById('gradeError');
+    
+    // 圖片處理變數
+    const fileInput = document.getElementById('fileInput');
+    const fileLabel = document.getElementById('fileLabel');
+    const imagePreview = document.getElementById('imagePreview');
+    const removeImgBtn = document.getElementById('removeImgBtn');
+    let base64Image = ""; 
 
-    // 頁面載入時先抓取一次資料
-    window.addEventListener('DOMContentLoaded', () => {
-        fetchData();
+    window.addEventListener('DOMContentLoaded', fetchData);
+
+    // 圖片上傳邏輯
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.size > 2 * 1024 * 1024) {
+            alert("圖片大小請小於 2MB");
+            this.value = "";
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            base64Image = event.target.result; 
+            imagePreview.src = base64Image;
+            imagePreview.style.display = 'inline-block';
+            removeImgBtn.style.display = 'inline-block';
+            fileLabel.textContent = "✅ 已選擇圖片: " + file.name;
+        };
+        reader.readAsDataURL(file);
     });
 
-    // 處理表單送出
+    removeImgBtn.addEventListener('click', function() {
+        fileInput.value = "";
+        base64Image = "";
+        imagePreview.style.display = 'none';
+        removeImgBtn.style.display = 'none';
+        fileLabel.textContent = "📷 點擊選擇圖片";
+    });
+
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         
-        // --- 處理多選年級邏輯 ---
         const checkedGrades = Array.from(document.querySelectorAll('input[name="grade"]:checked'))
                                    .map(cb => cb.value);
 
         if (checkedGrades.length === 0) {
             gradeError.style.display = 'block';
-            return; // 阻止送出
+            return;
         } else {
             gradeError.style.display = 'none';
         }
         
-        // 將陣列轉為字串，用逗號分隔，例如 "小一, 小二"
-        const gradeString = checkedGrades.join(', ');
-
-        // 鎖定按鈕
         submitBtn.disabled = true;
-        submitBtn.textContent = "傳送中...";
+        submitBtn.textContent = "資料上傳中 (圖片可能需要幾秒鐘)...";
 
         const data = {
             name: document.getElementById('teacherName').value,
-            grade: gradeString, // 使用組合後的字串
+            grade: checkedGrades.join(', '),
             category: document.getElementById('category').value,
             topic: document.getElementById('topic').value,
-            content: document.getElementById('content').value
+            content: document.getElementById('content').value,
+            image: base64Image
         };
 
         fetch(SCRIPT_URL, {
@@ -425,15 +374,15 @@
         })
         .then(response => response.json())
         .then(result => {
-            alert('資料已成功送出！感謝您的分享。');
+            alert('資料已成功送出！');
             form.reset();
-            // 重置 checkbox 選擇
             document.querySelectorAll('input[name="grade"]').forEach(cb => cb.checked = false);
-            fetchData(); 
+            removeImgBtn.click();
+            fetchData();
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('發生錯誤，請稍後再試。');
+            alert('發生錯誤，可能是圖片過大或網路問題。');
         })
         .finally(() => {
             submitBtn.disabled = false;
@@ -442,7 +391,7 @@
     });
 
     function fetchData() {
-        feedContainer.innerHTML = ''; 
+        feedContainer.innerHTML = '';
         loadingIndicator.style.display = 'block';
 
         fetch(SCRIPT_URL)
@@ -477,7 +426,11 @@
             const date = new Date(item.timestamp);
             const dateStr = `${date.getMonth()+1}/${date.getDate()}`;
 
-            // 將年級資料顯示稍微美化一下
+            let imageHtml = '';
+            if (item.imageUrl && item.imageUrl.startsWith('http')) {
+                imageHtml = `<a href="${item.imageUrl}" target="_blank"><img src="${item.imageUrl}" class="card-image" loading="lazy"></a>`;
+            }
+
             card.innerHTML = `
                 <div class="card-header">
                     <span>${item.name}</span>
@@ -489,6 +442,7 @@
                 </div>
                 <div class="card-title">${item.topic}</div>
                 <div class="card-content">${item.content}</div>
+                ${imageHtml}
             `;
             feedContainer.appendChild(card);
         });
