@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自然科教學經驗交流平台</title>
+    <style>
+        :root {
+            --primary-color: #006064; /* 科學深青色 */
+            --accent-color: #4DD0E1; /* 淺青色 highlight */
+            --bg-color: #F5F7FA;     /* 淺灰白背景 */
+            --card-bg: #FFFFFF;      /* 卡片白底 */
+            --text-main: #263238;    /* 深灰字體 */
+            --text-sec: #546E7A;     /* 次要字體 */
+            --border-radius: 8px;
+            --input-border: #CFD8DC;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden; /* 防止整個頁面捲動 */
+        }
+
+        .container {
+            display: flex;
+            width: 95%;
+            max-width: 1400px;
+            height: 95vh;
+            margin-top: 2.5vh;
+            gap: 20px;
+        }
+
+        /* 左側輸入區 */
+        .input-section {
+            flex: 1;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            border-top: 5px solid var(--primary-color);
+        }
+
+        /* 右側顯示區 */
+        .display-section {
+            flex: 1.5;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border: 1px solid #E0E0E0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        /* 表單樣式 */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--text-sec);
+            font-size: 0.9rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            background-color: #FAFAFA;
+            font-size: 1rem;
+            box-sizing: border-box; /* 確保 padding 不會撐大寬度 */
+            transition: border 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: #FFF;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        button.submit-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+
+        button.submit-btn:hover {
+            background-color: #004D40;
+        }
+
+        button.submit-btn:disabled {
+            background-color: #B0BEC5;
+            cursor: not-allowed;
+        }
+
+        /* 右側卡片列表樣式 */
+        .feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .refresh-btn {
+            background: none;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 5px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .refresh-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .feed-container {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .card {
+            background: white;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-sec);
+            margin-bottom: 8px;
+        }
+
+        .card-tag {
+            background-color: #E0F7FA;
+            color: #006064;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .card-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: var(--text-main);
+        }
+
+        .card-content {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #455A64;
+            white-space: pre-wrap; /* 保留換行 */
+        }
+        
+        /* Loading 動畫 */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+                overflow-y: auto;
+            }
+            body {
+                overflow: auto;
+                height: auto;
+            }
+            .input-section, .display-section {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 左邊：輸入區 -->
+    <div class="input-section">
+        <h2>🔬 自然科教學記錄與分享</h2>
+        <form id="surveyForm">
+            <div class="form-group">
+                <label for="teacherName">老師姓名</label>
+                <input type="text" id="teacherName" placeholder="請輸入您的全名" required>
+            </div>
+
+            <div class="form-group">
+                <label for="grade">授課年級</label>
+                <select id="grade" required>
+                    <option value="" disabled selected>請選擇年級</option>
+                    <option value="幼大">幼大 (Kindergarten)</option>
+                    <option value="小一">小一 (G1)</option>
+                    <option value="小二">小二 (G2)</option>
+                    <option value="小三">小三 (G3)</option>
+                    <option value="小四">小四 (G4)</option>
+                    <option value="小五">小五 (G5)</option>
+                    <option value="小六">小六 (G6)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="category">回饋分類</label>
+                <select id="category" required>
+                    <option value="教案">教案 (Teaching Materials)</option>
+                    <option value="班級經營">班級經營 (Classroom Mgmt)</option>
+                    <option value="器材">器材 (Equipment)</option>
+                    <option value="其他">其他 (Others)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="topic">課程主題</label>
+                <input type="text" id="topic" placeholder="例如：空氣的熱脹冷縮" required>
+            </div>
+
+            <div class="form-group">
+                <label for="content">分享或建議內容</label>
+                <textarea id="content" placeholder="請輸入您想分享的教學亮點、遇到的問題或建議..." required></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">送出資料</button>
+        </form>
+    </div>
+
+    <!-- 右邊：顯示區 -->
+    <div class="display-section">
+        <div class="feed-header">
+            <h3>📢 老師們的分享動態</h3>
+            <button class="refresh-btn" onclick="fetchData()">⟳ 重新整理</button>
+        </div>
+        <div id="loadingIndicator" style="text-align: center; display: none;">
+            <div class="loader"></div> 載入中...
+        </div>
+        <div class="feed-container" id="feedContainer">
+            <!-- 資料會動態插入這裡 -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // ******************************************************
+    // 請將下方的 URL 替換成您部署後的 Web App URL
+    // ******************************************************
+    const SCRIPT_URL = "https://script.google.com/macros/s/你的_ID_會在這裡/exec";
+
+    const form = document.getElementById('surveyForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const feedContainer = document.getElementById('feedContainer');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+
+    // 頁面載入時先抓取一次資料
+    window.addEventListener('DOMContentLoaded', () => {
+        fetchData();
+    });
+
+    // 處理表單送出
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        // 鎖定按鈕避免重複送出
+        submitBtn.disabled = true;
+        submitBtn.textContent = "傳送中...";
+
+        const data = {
+            name: document.getElementById('teacherName').value,
+            grade: document.getElementById('grade').value,
+            category: document.getElementById('category').value,
+            topic: document.getElementById('topic').value,
+            content: document.getElementById('content').value
+        };
+
+        // 使用 fetch 送出 POST 請求 (no-cors 模式是 GAS 的限制)
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            alert('資料已成功送出！感謝您的分享。');
+            form.reset();
+            fetchData(); // 重新抓取資料以顯示最新一筆
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('發生錯誤，請稍後再試。');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "送出資料";
+        });
+    });
+
+    // 抓取資料函數
+    function fetchData() {
+        feedContainer.innerHTML = ''; // 清空目前顯示
+        loadingIndicator.style.display = 'block';
+
+        fetch(SCRIPT_URL)
+        .then(response => response.json())
+        .then(data => {
+            loadingIndicator.style.display = 'none';
+            if (data.length === 0) {
+                feedContainer.innerHTML = '<p style="text-align:center; color:#999;">目前尚無分享資料。</p>';
+                return;
+            }
+            renderFeed(data);
+        })
+        .catch(error => {
+            console.error('Fetching error:', error);
+            loadingIndicator.style.display = 'none';
+            feedContainer.innerHTML = '<p style="text-align:center; color:red;">讀取資料失敗。</p>';
+        });
+    }
+
+    // 渲染右側列表
+    function renderFeed(data) {
+        data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+
+            // 依據不同分類給予不同邊框色 (Optional)
+            let borderColor = '#4DD0E1';
+            if(item.category === '班級經營') borderColor = '#FFB74D';
+            if(item.category === '器材') borderColor = '#90A4AE';
+            if(item.category === '其他') borderColor = '#E57373';
+            
+            card.style.borderLeftColor = borderColor;
+
+            // 格式化日期 (若需要)
+            const date = new Date(item.timestamp);
+            const dateStr = `${date.getMonth()+1}/${date.getDate()}`;
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <span>${item.name} (${item.grade})</span>
+                    <span>${dateStr}</span>
+                </div>
+                <div style="margin-bottom: 5px;">
+                    <span class="card-tag" style="color: ${borderColor === '#4DD0E1' ? '#006064' : 'black'}; background: ${borderColor}33">${item.category}</span>
+                </div>
+                <div class="card-title">${item.topic}</div>
+                <div class="card-content">${item.content}</div>
+            `;
+            feedContainer.appendChild(card);
+        });
+    }
+</script>
+
+</body>
+</html>
