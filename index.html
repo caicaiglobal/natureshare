@@ -416,6 +416,7 @@
             const card = document.createElement('div');
             card.className = 'card';
 
+            // 1. 設定邊框顏色
             let borderColor = '#4DD0E1';
             if(item.category === '班級經營') borderColor = '#FFB74D';
             if(item.category === '器材') borderColor = '#90A4AE';
@@ -423,17 +424,39 @@
             
             card.style.borderLeftColor = borderColor;
 
+            // 2. 處理日期
             const date = new Date(item.timestamp);
             const dateStr = `${date.getMonth()+1}/${date.getDate()}`;
 
+            // 3. 處理圖片
             let imageHtml = '';
             if (item.imageUrl && item.imageUrl.startsWith('http')) {
+                // 圖片也加上縮圖樣式，點擊才看大圖 (這裡維持原本設計)
                 imageHtml = `<a href="${item.imageUrl}" target="_blank"><img src="${item.imageUrl}" class="card-image" loading="lazy"></a>`;
             }
 
+            // 雖然在後端做過，但在前端再做一次可確保萬無一失
+            let displayName = item.name;
+            if (displayName.length > 0) {
+                // 如果名字裡還沒包含 "老師" (避免重複疊加)，且長度大於1
+                if (!displayName.includes("老師")) {
+                     displayName = displayName.charAt(0) + " 老師";
+                }
+            }
+
+            // --- 內容只顯示前 20 個字 ---
+            let displayContent = item.content;
+            let fullContent = item.content.replace(/"/g, '&quot;'); // 處理引號以免破壞 title 屬性
+            
+            if (displayContent.length > 20) {
+                displayContent = displayContent.substring(0, 20) + "...";
+            }
+
+            // 4. 組合 HTML
+            // 在 card-content 加上 title 屬性，這樣滑鼠移過去可以看到完整內容
             card.innerHTML = `
                 <div class="card-header">
-                    <span>${item.name}</span>
+                    <span>${displayName}</span> 
                     <span>${dateStr}</span>
                 </div>
                 <div style="margin-bottom: 5px; display:flex; align-items:center; flex-wrap:wrap; gap:5px;">
@@ -441,7 +464,7 @@
                     <span class="grade-tag">授課: ${item.grade}</span>
                 </div>
                 <div class="card-title">${item.topic}</div>
-                <div class="card-content">${item.content}</div>
+                <div class="card-content" title="${fullContent}">${displayContent}</div>
                 ${imageHtml}
             `;
             feedContainer.appendChild(card);
