@@ -381,8 +381,41 @@
     const removeImgBtn = document.getElementById('removeImgBtn');
     let base64Image = ""; 
 
-    window.addEventListener('DOMContentLoaded', fetchData);
+   // window.addEventListener('DOMContentLoaded', fetchData);
+// --- 新增：通關密語邏輯 ---
+    // 設定您的密碼 (您可以自行修改這裡的字串)
+    const ACCESS_CODE = "since1984"; 
 
+    const loginOverlay = document.getElementById('loginOverlay');
+    const passcodeInput = document.getElementById('passcodeInput');
+
+    // 檢查密碼函數
+    function checkLogin() {
+        const inputVal = passcodeInput.value;
+        if (inputVal === ACCESS_CODE) {
+            // 密碼正確：
+            // 1. 淡出遮罩
+            loginOverlay.style.opacity = '0';
+            // 2. 0.5秒後完全移除遮罩元素 (避免擋住點擊)
+            setTimeout(() => {
+                loginOverlay.style.display = 'none';
+            }, 500);
+            
+            // 3. 這時候才開始抓取資料 (節省流量並增加一點點安全性)
+            fetchData();
+        } else {
+            // 密碼錯誤
+            alert("❌ 通關密語錯誤！請洽詢管理員。");
+            passcodeInput.value = ""; // 清空輸入框
+            passcodeInput.focus();
+        }
+    }
+
+    // 注意：原本的 window.addEventListener('DOMContentLoaded', fetchData); 要刪除或註解掉
+    // 改成只讓游標停在密碼框
+    window.addEventListener('DOMContentLoaded', () => {
+        passcodeInput.focus();
+    });
     // 圖片上傳邏輯
     fileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
