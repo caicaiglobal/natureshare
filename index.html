@@ -383,34 +383,27 @@
 
    // window.addEventListener('DOMContentLoaded', fetchData);
 // --- 新增：通關密語邏輯 ---
-    // 設定您的密碼 (您可以自行修改這裡的字串)
-    const ACCESS_CODE = "since1984"; 
-
+    let currentPassword = ""; // 用來記住使用者輸入的密碼
+    
     const loginOverlay = document.getElementById('loginOverlay');
     const passcodeInput = document.getElementById('passcodeInput');
 
-    // 檢查密碼函數
+// 登入檢查
     function checkLogin() {
         const inputVal = passcodeInput.value;
-        if (inputVal === ACCESS_CODE) {
-            // 密碼正確：
-            // 1. 淡出遮罩
-            loginOverlay.style.opacity = '0';
-            // 2. 0.5秒後完全移除遮罩元素 (避免擋住點擊)
-            setTimeout(() => {
-                loginOverlay.style.display = 'none';
-            }, 500);
-            
-            // 3. 這時候才開始抓取資料 (節省流量並增加一點點安全性)
-            fetchData();
-        } else {
-            // 密碼錯誤
-            alert("❌ 通關密語錯誤！請洽詢管理員。");
-            passcodeInput.value = ""; // 清空輸入框
-            passcodeInput.focus();
+        if (!inputVal) {
+            alert("請輸入密碼");
+            return;
         }
-    }
 
+        // 視覺回饋：鎖定按鈕，讓使用者知道正在連線
+        const loginBtn = document.querySelector('.login-btn');
+        loginBtn.textContent = "驗證中...";
+        loginBtn.disabled = true;
+
+        // 直接呼叫 fetchData，並把密碼傳進去，讓後端決定是否通過
+        fetchData(inputVal);
+    }
     // 注意：原本的 window.addEventListener('DOMContentLoaded', fetchData); 要刪除或註解掉
     // 改成只讓游標停在密碼框
     window.addEventListener('DOMContentLoaded', () => {
@@ -493,14 +486,57 @@
         });
     });
 
-    function fetchData() {
+// 修改後的抓取資料函數 (支援後端密碼驗證)
+    function fetchData(password) {
+        // 如果有傳入新密碼 (從登入畫面來的)，就更新全域變數
+        // 如果沒傳入 (從重新整理按鈕來的)，就沿用舊的 currentPassword
+        if (password) {
+            currentPassword = password;
+        }
+
+        // 防呆：如果完全沒密碼，不執行
+        if (!currentPassword) return;
+
         feedContainer.innerHTML = '';
         loadingIndicator.style.display = 'block';
 
-        fetch(SCRIPT_URL)
+        // 關鍵修改：將密碼拼接到網址後方 (?p=密碼)
+        const urlWithPass = `${SCRIPT_URL}?p=${encodeURIComponent(currentPassword)}`;
+
+        fetch(urlWithPass)
         .then(response => response.json())
         .then(data => {
             loadingIndicator.style.display = 'none';
+            
+            // --- 情況 A：後端回傳錯誤 (密碼不對) ---
+            if (data.error) {
+                // 如果目前還在登入畫面，顯示 Alert 並重置按鈕
+                if (loginOverlay.style.display !== 'none') {
+                    alert("❌ " + data.message); // 顯示後端回傳的「密碼錯誤」
+                    passcodeInput.value = "";
+                    passcodeInput.focus();
+                    
+                    const loginBtn = document.querySelector('.login-btn');
+                    loginBtn.textContent = "進入系統";
+                    loginBtn.disabled = false;
+                } else {
+                    // 如果已經在系統內 (極少見，除非後端改了密碼)，顯示錯誤訊息
+                    feedContainer.innerHTML = '<p style="text-align:center; color:red;">密碼驗證失敗，請重新整理頁面。</p>';
+                }
+                return; // 停止執行，不渲染資料
+            }
+
+            // --- 情況 B：驗證成功 (拿到資料了) ---
+            
+            // 1. 如果登入遮罩還在，把它關掉
+            if (loginOverlay.style.display !== 'none') {
+                loginOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loginOverlay.style.display = 'none';
+                }, 500);
+            }
+
+            // 2. 顯示資料 (這裡邏輯不變)
             if (data.length === 0) {
                 feedContainer.innerHTML = '<p style="text-align:center; color:#999;">目前尚無分享資料。</p>';
                 return;
@@ -510,7 +546,16 @@
         .catch(error => {
             console.error('Fetching error:', error);
             loadingIndicator.style.display = 'none';
-            feedContainer.innerHTML = '<p style="text-align:center; color:red;">讀取資料失敗。</p>';
+            
+            // 如果連線失敗 (例如網路斷了)，恢復登入按鈕
+            if (loginOverlay.style.display !== 'none') {
+                const loginBtn = document.querySelector('.login-btn');
+                loginBtn.textContent = "進入系統";
+                loginBtn.disabled = false;
+                alert("連線錯誤或後端無回應，請稍後再試。");
+            } else {
+                feedContainer.innerHTML = '<p style="text-align:center; color:red;">讀取資料失敗。</p>';
+            }
         });
     }
 
