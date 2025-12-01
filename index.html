@@ -215,8 +215,78 @@
             body { overflow: auto; height: auto; }
             .input-section, .display-section { width: 100%; margin-bottom: 20px; }
         }
+
+/* --- 通關密語登入層 --- */
+        #loginOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary-color);
+            z-index: 9999; /* 確保在最上層 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            transition: opacity 0.5s;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 300px;
+        }
+
+        .login-box h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .login-box input {
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+
+        .login-btn {
+            background-color: var(--accent-color);
+            color: #006064;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .login-btn:hover {
+            background-color: #26C6DA;
+        }
+
+
+
+        
     </style>
 </head>
+<!-- 通關密語遮罩層 -->
+<div id="loginOverlay">
+    <div class="login-box">
+        <h3>🔒 分享動態</h3>
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 15px;">請輸入通關密語以繼續</p>
+        <!-- type="password" 隱藏輸入的字元 -->
+        <input type="password" id="passcodeInput" placeholder="輸入密碼" onkeyup="if(event.key==='Enter') checkLogin()">
+        <button class="login-btn" onclick="checkLogin()">進入平台</button>
+    </div>
+</div>
+    
 <body>
 
 <div class="container">
