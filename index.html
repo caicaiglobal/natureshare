@@ -218,6 +218,7 @@
 
 /* --- 通關密語登入層 --- */
         #loginOverlay {
+            display: none; 
             position: fixed;
             top: 0;
             left: 0;
@@ -406,9 +407,20 @@
     }
     // 注意：原本的 window.addEventListener('DOMContentLoaded', fetchData); 要刪除或註解掉
     // 改成只讓游標停在密碼框
+    //window.addEventListener('DOMContentLoaded', () => {
+    //    passcodeInput.focus();
+    //});
+
+// 頁面載入時的動作
     window.addEventListener('DOMContentLoaded', () => {
-        passcodeInput.focus();
+        // [修改前] 原本是讓游標停在密碼框 (暫時註解掉這行)
+        // passcodeInput.focus();
+
+        // [修改後] 自動執行抓取資料 (請將 '您的正確密碼' 換成您 Google Sheet 設定的那組)
+        // 這樣程式會以為使用者已經輸入密碼了，直接向後端要資料
+        fetchData('science'); 
     });
+    
     // 圖片上傳邏輯
     fileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
