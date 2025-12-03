@@ -216,77 +216,9 @@
             .input-section, .display-section { width: 100%; margin-bottom: 20px; }
         }
 
-/* --- 通關密語登入層 --- */
-        #loginOverlay {
-            display: none; 
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--primary-color);
-            z-index: 9999; /* 確保在最上層 */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            transition: opacity 0.5s;
-        }
 
-        .login-box {
-            background: white;
-            padding: 40px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            width: 300px;
-        }
-
-        .login-box h3 {
-            color: var(--primary-color);
-            margin-top: 0;
-            margin-bottom: 20px;
-        }
-
-        .login-box input {
-            margin-bottom: 15px;
-            text-align: center;
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-        }
-
-        .login-btn {
-            background-color: var(--accent-color);
-            color: #006064;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            font-size: 1rem;
-        }
-
-        .login-btn:hover {
-            background-color: #26C6DA;
-        }
-
-
-
-        
     </style>
 </head>
-<!-- 通關密語遮罩層 -->
-<div id="loginOverlay">
-    <div class="login-box">
-        <h3>🔒 分享動態</h3>
-        <p style="color: #666; font-size: 0.9rem; margin-bottom: 15px;">請輸入通關密語以繼續</p>
-        <!-- type="password" 隱藏輸入的字元 -->
-        <input type="password" id="passcodeInput" placeholder="輸入密碼" onkeyup="if(event.key==='Enter') checkLogin()">
-        <button class="login-btn" onclick="checkLogin()">進入平台</button>
-    </div>
-</div>
     
 <body>
 
@@ -382,44 +314,33 @@
     const removeImgBtn = document.getElementById('removeImgBtn');
     let base64Image = ""; 
 
-   // window.addEventListener('DOMContentLoaded', fetchData);
-// --- 新增：通關密語邏輯 ---
-    let currentPassword = ""; // 用來記住使用者輸入的密碼
-    
-    const loginOverlay = document.getElementById('loginOverlay');
-    const passcodeInput = document.getElementById('passcodeInput');
-
-// 登入檢查
-    function checkLogin() {
-        const inputVal = passcodeInput.value;
-        if (!inputVal) {
-            alert("請輸入密碼");
-            return;
-        }
-
-        // 視覺回饋：鎖定按鈕，讓使用者知道正在連線
-        const loginBtn = document.querySelector('.login-btn');
-        loginBtn.textContent = "驗證中...";
-        loginBtn.disabled = true;
-
-        // 直接呼叫 fetchData，並把密碼傳進去，讓後端決定是否通過
-        fetchData(inputVal);
-    }
-    // 注意：原本的 window.addEventListener('DOMContentLoaded', fetchData); 要刪除或註解掉
-    // 改成只讓游標停在密碼框
-    //window.addEventListener('DOMContentLoaded', () => {
-    //    passcodeInput.focus();
-    //});
-
-// 頁面載入時的動作
+    // 頁面載入時：直接抓取資料 (不再需要密碼)
     window.addEventListener('DOMContentLoaded', () => {
-        // [修改前] 原本是讓游標停在密碼框 (暫時註解掉這行)
-        // passcodeInput.focus();
-
-        // [修改後] 自動執行抓取資料 (請將 '您的正確密碼' 換成您 Google Sheet 設定的那組)
-        // 這樣程式會以為使用者已經輸入密碼了，直接向後端要資料
-        fetchData('science'); 
+        fetchData();
     });
+
+    // 抓取資料函數 (恢復簡單版)
+    function fetchData() {
+        feedContainer.innerHTML = '';
+        loadingIndicator.style.display = 'block';
+
+        // 直接呼叫網址，不帶密碼參數
+        fetch(SCRIPT_URL)
+        .then(response => response.json())
+        .then(data => {
+            loadingIndicator.style.display = 'none';
+            if (data.length === 0) {
+                feedContainer.innerHTML = '<p style="text-align:center; color:#999;">目前尚無分享資料。</p>';
+                return;
+            }
+            renderFeed(data);
+        })
+        .catch(error => {
+            console.error('Fetching error:', error);
+            loadingIndicator.style.display = 'none';
+            feedContainer.innerHTML = '<p style="text-align:center; color:red;">讀取資料失敗。</p>';
+        });
+    }
     
     // 圖片上傳邏輯
     fileInput.addEventListener('change', function(e) {
