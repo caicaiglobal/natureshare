@@ -314,48 +314,23 @@
     const removeImgBtn = document.getElementById('removeImgBtn');
     let base64Image = ""; 
 
-    // 頁面載入時：直接抓取資料 (不再需要密碼)
+    // 頁面載入時：直接抓取資料
     window.addEventListener('DOMContentLoaded', () => {
         fetchData();
     });
 
-    // 抓取資料函數 (恢復簡單版)
-    function fetchData() {
-        feedContainer.innerHTML = '';
-        loadingIndicator.style.display = 'block';
-
-        // 直接呼叫網址，不帶密碼參數
-        fetch(SCRIPT_URL)
-        .then(response => response.json())
-        .then(data => {
-            loadingIndicator.style.display = 'none';
-            if (data.length === 0) {
-                feedContainer.innerHTML = '<p style="text-align:center; color:#999;">目前尚無分享資料。</p>';
-                return;
-            }
-            renderFeed(data);
-        })
-        .catch(error => {
-            console.error('Fetching error:', error);
-            loadingIndicator.style.display = 'none';
-            feedContainer.innerHTML = '<p style="text-align:center; color:red;">讀取資料失敗。</p>';
-        });
-    }
-    
-    // 圖片上傳邏輯
+    // 圖片上傳監聽
     fileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
-
         if (file.size > 2 * 1024 * 1024) {
             alert("圖片大小請小於 2MB");
             this.value = "";
             return;
         }
-
         const reader = new FileReader();
         reader.onload = function(event) {
-            base64Image = event.target.result; 
+            base64Image = event.target.result;
             imagePreview.src = base64Image;
             imagePreview.style.display = 'inline-block';
             removeImgBtn.style.display = 'inline-block';
@@ -372,6 +347,7 @@
         fileLabel.textContent = "📷 點擊選擇圖片";
     });
 
+    // 表單送出
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         
@@ -386,7 +362,7 @@
         }
         
         submitBtn.disabled = true;
-        submitBtn.textContent = "資料上傳中 (圖片可能需要幾秒鐘)...";
+        submitBtn.textContent = "資料上傳中...";
 
         const data = {
             name: document.getElementById('teacherName').value,
@@ -411,7 +387,7 @@
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('發生錯誤，可能是圖片過大或網路問題。');
+            alert('發生錯誤，請稍後再試。');
         })
         .finally(() => {
             submitBtn.disabled = false;
@@ -419,57 +395,15 @@
         });
     });
 
-// 修改後的抓取資料函數 (支援後端密碼驗證)
-    function fetchData(password) {
-        // 如果有傳入新密碼 (從登入畫面來的)，就更新全域變數
-        // 如果沒傳入 (從重新整理按鈕來的)，就沿用舊的 currentPassword
-        if (password) {
-            currentPassword = password;
-        }
-
-        // 防呆：如果完全沒密碼，不執行
-        if (!currentPassword) return;
-
+    // 抓取資料函數 (無密碼版)
+    function fetchData() {
         feedContainer.innerHTML = '';
         loadingIndicator.style.display = 'block';
 
-        // 關鍵修改：將密碼拼接到網址後方 (?p=密碼)
-        const urlWithPass = `${SCRIPT_URL}?p=${encodeURIComponent(currentPassword)}`;
-
-        fetch(urlWithPass)
+        fetch(SCRIPT_URL)
         .then(response => response.json())
         .then(data => {
             loadingIndicator.style.display = 'none';
-            
-            // --- 情況 A：後端回傳錯誤 (密碼不對) ---
-            if (data.error) {
-                // 如果目前還在登入畫面，顯示 Alert 並重置按鈕
-                if (loginOverlay.style.display !== 'none') {
-                    alert("❌ " + data.message); // 顯示後端回傳的「密碼錯誤」
-                    passcodeInput.value = "";
-                    passcodeInput.focus();
-                    
-                    const loginBtn = document.querySelector('.login-btn');
-                    loginBtn.textContent = "進入系統";
-                    loginBtn.disabled = false;
-                } else {
-                    // 如果已經在系統內 (極少見，除非後端改了密碼)，顯示錯誤訊息
-                    feedContainer.innerHTML = '<p style="text-align:center; color:red;">密碼驗證失敗，請重新整理頁面。</p>';
-                }
-                return; // 停止執行，不渲染資料
-            }
-
-            // --- 情況 B：驗證成功 (拿到資料了) ---
-            
-            // 1. 如果登入遮罩還在，把它關掉
-            if (loginOverlay.style.display !== 'none') {
-                loginOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    loginOverlay.style.display = 'none';
-                }, 500);
-            }
-
-            // 2. 顯示資料 (這裡邏輯不變)
             if (data.length === 0) {
                 feedContainer.innerHTML = '<p style="text-align:center; color:#999;">目前尚無分享資料。</p>';
                 return;
@@ -479,25 +413,16 @@
         .catch(error => {
             console.error('Fetching error:', error);
             loadingIndicator.style.display = 'none';
-            
-            // 如果連線失敗 (例如網路斷了)，恢復登入按鈕
-            if (loginOverlay.style.display !== 'none') {
-                const loginBtn = document.querySelector('.login-btn');
-                loginBtn.textContent = "進入系統";
-                loginBtn.disabled = false;
-                alert("連線錯誤或後端無回應，請稍後再試。");
-            } else {
-                feedContainer.innerHTML = '<p style="text-align:center; color:red;">讀取資料失敗。</p>';
-            }
+            feedContainer.innerHTML = '<p style="text-align:center; color:red;">讀取資料失敗。</p>';
         });
     }
 
+    // 渲染函數 (含姓名遮罩與字數限制)
     function renderFeed(data) {
         data.forEach(item => {
             const card = document.createElement('div');
             card.className = 'card';
 
-            // 1. 設定邊框顏色
             let borderColor = '#4DD0E1';
             if(item.category === '班級經營') borderColor = '#FFB74D';
             if(item.category === '器材') borderColor = '#90A4AE';
@@ -505,39 +430,30 @@
             
             card.style.borderLeftColor = borderColor;
 
-            // 2. 處理日期
             const date = new Date(item.timestamp);
             const dateStr = `${date.getMonth()+1}/${date.getDate()}`;
 
-            // 3. 處理圖片
             let imageHtml = '';
             if (item.imageUrl && item.imageUrl.startsWith('http')) {
-                // 圖片也加上縮圖樣式，點擊才看大圖 (這裡維持原本設計)
                 imageHtml = `<a href="${item.imageUrl}" target="_blank"><img src="${item.imageUrl}" class="card-image" loading="lazy"></a>`;
             }
 
-            // 雖然在後端做過，但在前端再做一次可確保萬無一失
+            // 前端再次確保隱私
             let displayName = item.name;
-            if (displayName.length > 0) {
-                // 如果名字裡還沒包含 "老師" (避免重複疊加)，且長度大於1
-                if (!displayName.includes("老師")) {
-                     displayName = displayName.charAt(0) + " 老師";
-                }
+            if (displayName && displayName.length > 0 && !displayName.includes("老師")) {
+                 displayName = displayName.charAt(0) + " 老師";
             }
 
-            // --- 內容只顯示前 20 個字 ---
+            // 字數限制
             let displayContent = item.content;
-            let fullContent = item.content.replace(/"/g, '&quot;'); // 處理引號以免破壞 title 屬性
-            
+            let fullContent = item.content.replace(/"/g, '&quot;');
             if (displayContent.length > 20) {
                 displayContent = displayContent.substring(0, 20) + "...";
             }
 
-            // 4. 組合 HTML
-            // 在 card-content 加上 title 屬性，這樣滑鼠移過去可以看到完整內容
             card.innerHTML = `
                 <div class="card-header">
-                    <span>${displayName}</span> 
+                    <span>${displayName}</span>
                     <span>${dateStr}</span>
                 </div>
                 <div style="margin-bottom: 5px; display:flex; align-items:center; flex-wrap:wrap; gap:5px;">
@@ -552,6 +468,7 @@
         });
     }
 </script>
+
 
 </body>
 </html>
