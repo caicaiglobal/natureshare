@@ -149,12 +149,41 @@
 
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--idea-color); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
+        /* --- 手機版專用樣式 --- */
         @media (max-width: 768px) {
-            .container { flex-direction: column; height: auto; overflow-y: auto; }
-            body { overflow: auto; height: auto; }
-            .input-section, .display-section { width: 100%; margin-bottom: 20px; }
+            /* 1. 解除高度鎖定，讓網頁可以無限往下滑 */
+            body {
+                overflow: auto !important; /* 強制開啟網頁捲軸 */
+                height: auto !important;
+            }
+            
+            /* 2. 改為上下排列，並允許容器長高 */
+            .container {
+                flex-direction: column; /* 上下排列 */
+                height: auto !important;
+                margin-top: 10px;
+                display: flex;
+            }
+
+            /* 3. 移除卡片內部的捲軸，改用網頁原本的捲軸 */
+            .input-section, .display-section {
+                width: 100%;
+                height: auto !important; /* 高度隨內容撐開 */
+                overflow: visible !important;
+                margin-bottom: 30px; /* 區塊間距加大 */
+                flex: none; /* 解除比例限制 */
+            }
+
+            /* 4. 微調顯示區順序 (選擇性：如果您希望手機先看動態，可加上 order) */
+            /* 目前維持：上面是輸入，往下滑是動態牆 */
+            
+            /* 5. 手機版標題字體稍微縮小 */
+            h2 { font-size: 1.5rem; }
+            
+            /* 6. 調整輸入框高度 */
+            textarea { min-height: 100px; }
         }
+        
     </style>
 </head>
 <body>
